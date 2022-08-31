@@ -28,7 +28,7 @@ import copy
 import numpy as np
 import time
 from PIL import Image
-import tools.infer.pytorchocr_utility as utility
+# import tools.infer.pytorchocr_utility as utility
 import tools.infer.predict_rec as predict_rec
 import tools.infer.predict_det as predict_det
 import tools.infer.predict_cls as predict_cls
@@ -38,13 +38,91 @@ from tools.infer.pytorchocr_utility import draw_ocr_box_txt
 from tools.infer.predict_system import TextSystem
 from tools.infer.pytorchocr_utility import parse_args
 
+def get_default_args():
+    from argparse import Namespace
+
+    default_dict = {
+        'use_gpu': True,
+        'gpu_mem': 500,
+        'image_dir': None,
+        'det_algorithm': 'DB',
+        'det_model_path': None,
+        'det_limit_side_len': 960,
+        'det_limit_type': 'max',
+        'det_db_thresh': 0.3,
+        'det_db_box_thresh': 0.6,
+        'det_db_unclip_ratio': 1.5,
+        'max_batch_size': 10,
+        'use_dilation': False,
+        'det_db_score_mode': 'fast',
+        'det_east_score_thresh': 0.8,
+        'det_east_cover_thresh': 0.1,
+        'det_east_nms_thresh': 0.2,
+        'det_sast_score_thresh': 0.5,
+        'det_sast_nms_thresh': 0.2,
+        'det_sast_polygon': False,
+        'det_pse_thresh': 0,
+        'det_pse_box_thresh': 0.85,
+        'det_pse_min_area': 16,
+        'det_pse_box_type': 'box',
+        'det_pse_scale': 1,
+        'scales': [8, 16, 32],
+        'alpha': 1.0,
+        'beta': 1.0,
+        'fourier_degree': 5,
+        'det_fce_box_type': 'poly',
+        'rec_algorithm': 'CRNN',
+        'rec_model_path': None,
+        'rec_image_shape': '3, 32, 320',
+        'rec_char_type': 'ch',
+        'rec_batch_num': 6,
+        'max_text_length': 25,
+        'use_space_char': True,
+        'drop_score': 0.5,
+        'limited_max_width': 1280,
+        'limited_min_width': 16,
+        'vis_font_path': './doc/fonts/simfang.ttf',
+        'rec_char_dict_path': './pytorchocr/utils/ppocr_keys_v1.txt',
+        'use_angle_cls': False,
+        'cls_model_path': None,
+        'cls_image_shape': '3, 48, 192',
+        'label_list': ['0', '180'],
+        'cls_batch_num': 6,
+        'cls_thresh': 0.9,
+        'enable_mkldnn': False,
+        'use_pdserving': False,
+        'e2e_algorithm': 'PGNet',
+        'e2e_model_path': None,
+        'e2e_limit_side_len': 768,
+        'e2e_limit_type': 'max',
+        'e2e_pgnet_score_thresh': 0.5,
+        'e2e_char_dict_path': './pytorchocr/utils/ic15_dict.txt',
+        'e2e_pgnet_valid_set': 'totaltext',
+        'e2e_pgnet_polygon': True,
+        'e2e_pgnet_mode': 'fast',
+        'det_yaml_path': None,
+        'rec_yaml_path': None,
+        'cls_yaml_path': None,
+        'e2e_yaml_path': None,
+        'use_mp': False,
+        'total_process_num': 1,
+        'process_id': 0,
+        'benchmark': False,
+        'save_log_path': './log_output/',
+        'show_log': True
+    }
+    args = Namespace(**default_dict)
+    return args
+
 
 class PaddlePytorchOCR(TextSystem):
     def __init__(self, **kwargs):
         params = {**kwargs}
 
-        args = parse_args() # get_default_args()
+        # args = parse_args() # 
+        args = get_default_args()
         
+        # import ipdb;ipdb.set_trace()
         ## update args if params available
         ## Prefer params  value over args
         args.__dict__.update(params)
@@ -184,7 +262,7 @@ def main():
     print(f"rec_res: ", rec_res)
 
     print(f"Wordlevel-------")
-    
+
     ## custom
     paddleocr_engine_wordlevel = PaddlePytorchOCR(
         det_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/en_ptocr_v3_det_infer.pth",
