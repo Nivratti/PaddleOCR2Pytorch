@@ -246,37 +246,49 @@ class PaddlePytorchOCR(TextSystem):
 
     
 def main():
+    from pathlib import Path
+
+    __dir__ = os.path.dirname(__file__)
+
+    ## Get home dir
+    home = str(Path.home())
+
+    ## model dir
+    pdtorch_model_dir = os.path.join(
+        home, ".ocr_models", "PaddleOCR2Pytorch-models"
+    )
+
     ocr_engine = PaddlePytorchOCR(
-        det_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/en_ptocr_v3_det_infer.pth",
-        det_yaml_path="/app/OCR/PaddleOCR2Pytorch/configs/det/det_ppocr_v3.yml",
+        det_model_path=os.path.join(pdtorch_model_dir, "en_ptocr_v3_det_infer.pth"),
+        det_yaml_path=os.path.join(__dir__, "configs/det/det_ppocr_v3.yml"),
         
         use_angle_cls=True,
-        cls_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/ch_ptocr_mobile_v2.0_cls_infer.pth",
-        cls_yaml_path="/app/OCR/PaddleOCR2Pytorch/configs/cls/cls_mv3.yml",
+        cls_model_path=os.path.join(pdtorch_model_dir, "ch_ptocr_mobile_v2.0_cls_infer.pth"),
+        cls_yaml_path=os.path.join(__dir__, "configs/cls/cls_mv3.yml"),
 
-        rec_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/en_ptocr_v3_rec_infer.pth",
-        rec_yaml_path="/app/OCR/PaddleOCR2Pytorch/configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml",
-        rec_char_dict_path="/app/OCR/PaddleOCR2Pytorch/pytorchocr/utils/en_dict.txt",
+        rec_model_path=os.path.join(pdtorch_model_dir, "en_ptocr_v3_rec_infer.pth"),
+        rec_yaml_path=os.path.join(__dir__, "configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml"),
+        rec_char_dict_path=os.path.join(__dir__, "pytorchocr/utils/en_dict.txt"),
     )
-    rec_res = ocr_engine.ocr("/app/OCR/images/pan-card-500x500.jpg")
+    rec_res = ocr_engine.ocr(os.path.join(__dir__, "../images/pan-card-500x500.jpg"))
     print(f"rec_res: ", rec_res)
 
     print(f"Wordlevel-------")
 
     ## custom
     paddleocr_engine_wordlevel = PaddlePytorchOCR(
-        det_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/en_ptocr_v3_det_infer.pth",
-        det_yaml_path="/app/OCR/PaddleOCR2Pytorch/configs/det/det_ppocr_v3.yml",
+        det_model_path=os.path.join(pdtorch_model_dir, "en_ptocr_v3_det_infer.pth"),
+        det_yaml_path=os.path.join(__dir__, "configs/det/det_ppocr_v3.yml"),
         
         use_angle_cls=True,
-        cls_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/ch_ptocr_mobile_v2.0_cls_infer.pth",
-        cls_yaml_path="/app/OCR/PaddleOCR2Pytorch/configs/cls/cls_mv3.yml",
+        cls_model_path=os.path.join(pdtorch_model_dir, "ch_ptocr_mobile_v2.0_cls_infer.pth"),
+        cls_yaml_path=os.path.join(__dir__, "configs/cls/cls_mv3.yml"),
 
-        rec_model_path="/app/.ocr_models/PaddleOCR2Pytorch-models/model_rec_custom_fs_v7.pth",
-        rec_yaml_path="/app/OCR/PaddleOCR2Pytorch/configs/rec/ch_ppocr_v2.0/rec_chinese_common_train_v2.0.yml",
-        rec_char_dict_path="/app/OCR/PaddleOCR2Pytorch/pytorchocr/utils/ppocr_keys_v1.txt",
+        rec_model_path=os.path.join(pdtorch_model_dir, "model_rec_custom_fs_v7.pth"),
+        rec_yaml_path=os.path.join(__dir__, "configs/rec/ch_ppocr_v2.0/rec_chinese_common_train_v2.0.yml"),
+        rec_char_dict_path=os.path.join(__dir__, "pytorchocr/utils/ppocr_keys_v1.txt"),
     )
-    rec_res = paddleocr_engine_wordlevel.ocr("/app/OCR/images/pan-card-500x500.jpg")
+    rec_res = paddleocr_engine_wordlevel.ocr(os.path.join(__dir__, "../images/pan-card-500x500.jpg"))
     print(f"rec_res: ", rec_res)
 
     # import pdb;pdb.set_trace()
