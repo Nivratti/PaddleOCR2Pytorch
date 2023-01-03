@@ -133,3 +133,5 @@ dmypy.json
 
 # pth
 *.pth
+
+inference_results/
