@@ -276,7 +276,8 @@ def main():
         rec_yaml_path=os.path.join(__dir__, "configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml"),
         rec_char_dict_path=os.path.join(__dir__, "pytorchocr/utils/en_dict.txt"),
     )
-    rec_res = ocr_engine.ocr(os.path.join(__dir__, "../resources/images/pan-card-500x500.jpg"))
+    ## pan.jpg you can check onnx result at -- https://github.com/Nivratti/paddleocr_onnx_inference/blob/main/result-cross-check/pan-sample/ocr_en_v3_result/pan-card.json
+    rec_res = ocr_engine.ocr(os.path.join(__dir__, "doc/imgs_en/pan-card.jpg"))
     print(f"rec_res: ", rec_res)
 
     print(f"Wordlevel-------")
