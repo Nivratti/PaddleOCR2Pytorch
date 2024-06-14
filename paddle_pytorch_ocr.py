@@ -11,7 +11,11 @@ from loguru import logger
 import copy
 import time
 
-__dir__ = os.path.dirname(__file__)
+# __dir__ = os.path.dirname(__file__)
+import sys
+from inspect import getsourcefile
+from os.path import dirname, abspath
+__dir__ = dirname(abspath(getsourcefile(lambda:0)))
 
 sys.path.append(os.path.join(__dir__, ''))
 
@@ -38,6 +42,10 @@ from tools.infer.pytorchocr_utility import draw_ocr_box_txt
 from tools.infer.predict_system import TextSystem
 from tools.infer.pytorchocr_utility import parse_args
 
+MODEL_DIR = os.path.join(
+    __dir__, "ocr_models"
+)
+
 def get_default_args():
     from argparse import Namespace
 
@@ -46,7 +54,7 @@ def get_default_args():
         'gpu_mem': 500,
         'image_dir': None,
         'det_algorithm': 'DB',
-        'det_model_path': None,
+        'det_model_path': os.path.join(MODEL_DIR, "det_ft_v1.0.pth"),
         'det_limit_side_len': 960,
         'det_limit_type': 'max',
         'det_db_thresh': 0.3,
@@ -71,9 +79,9 @@ def get_default_args():
         'beta': 1.0,
         'fourier_degree': 5,
         'det_fce_box_type': 'poly',
-        'rec_algorithm': 'CRNN',
-        'rec_model_path': None,
-        'rec_image_shape': '3, 32, 320',
+        'rec_algorithm': 'SVTR_LCNet',
+        'rec_model_path': os.path.join(MODEL_DIR, "rec_ft_v3.0.2.pth"),
+        'rec_image_shape': '3, 48, 320',
         'rec_char_type': 'ch',
         'rec_batch_num': 6,
         'max_text_length': 25,
@@ -82,9 +90,9 @@ def get_default_args():
         'limited_max_width': 1280,
         'limited_min_width': 16,
         'vis_font_path': './doc/fonts/simfang.ttf',
-        'rec_char_dict_path': './pytorchocr/utils/ppocr_keys_v1.txt',
+        'rec_char_dict_path': os.path.join(__dir__, "pytorchocr/utils/en_dict.txt"),
         'use_angle_cls': False,
-        'cls_model_path': None,
+        'cls_model_path': os.path.join(MODEL_DIR, "cls_ft_4.0.1.pth"),
         'cls_image_shape': '3, 48, 192',
         'label_list': ['0', '180'],
         'cls_batch_num': 6,
@@ -100,9 +108,9 @@ def get_default_args():
         'e2e_pgnet_valid_set': 'totaltext',
         'e2e_pgnet_polygon': True,
         'e2e_pgnet_mode': 'fast',
-        'det_yaml_path': None,
-        'rec_yaml_path': None,
-        'cls_yaml_path': None,
+        'det_yaml_path': os.path.join(__dir__, "configs/det/det_ppocr_v3.yml"),
+        'rec_yaml_path': os.path.join(__dir__, "configs/rec/PP-OCRv3/en_PP-OCRv3_rec.yml"),
+        'cls_yaml_path': os.path.join(__dir__, "configs/cls/cls_mv3.yml"),
         'e2e_yaml_path': None,
         'use_mp': False,
         'total_process_num': 1,
