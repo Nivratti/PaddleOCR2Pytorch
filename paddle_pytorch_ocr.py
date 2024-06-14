@@ -39,7 +39,7 @@ import tools.infer.predict_cls as predict_cls
 from pytorchocr.utils.utility import get_image_file_list, check_and_read_gif
 from tools.infer.pytorchocr_utility import draw_ocr_box_txt
 
-from tools.infer.predict_system import TextSystem
+from tools.infer.predict_system import TextSystem, sorted_boxes
 from tools.infer.pytorchocr_utility import parse_args
 
 MODEL_DIR = os.path.join(
@@ -203,6 +203,43 @@ class PaddlePytorchOCR(TextSystem):
     #     time_dict['all'] = end - start
     #     return filter_boxes, filter_rec_res, time_dict
 
+    def detect_and_classify_text_regions(self, img):
+        """
+        Detects text regions in an image, crops those regions, and classifies the text angles.
+
+        Args:
+            img (numpy.ndarray): The input image in which text regions are to be detected.
+
+        Returns:
+            tuple: A tuple containing:
+                - img_crop_list (list of numpy.ndarray): A list of cropped images containing the detected text regions.
+                - angle_list (list of float): A list of angles corresponding to the orientation of the text in each cropped image.
+
+        Raises:
+            ValueError: If the input image is not valid or if text detection fails.
+        """
+        ori_im = img.copy()
+        dt_boxes, elapse = self.text_detector(img)
+        # print("dt_boxes num : {}, elapse : {}".format(len(dt_boxes), elapse))
+        if dt_boxes is None:
+            return None, None
+        
+        img_crop_list = []
+
+        dt_boxes = sorted_boxes(dt_boxes)
+
+        for bno in range(len(dt_boxes)):
+            tmp_box = copy.deepcopy(dt_boxes[bno])
+            img_crop = self.get_rotate_crop_image(ori_im, tmp_box)
+            img_crop_list.append(img_crop)
+
+        # text angle classification
+        img_crop_list, angle_list, elapse = self.text_classifier(
+            img_crop_list)
+        
+        # print("cls num  : {}, elapse : {}".format(len(img_crop_list), elapse))
+        return dt_boxes, img_crop_list, angle_list
+    
     def ocr(self, img, det=True, rec=True, cls=True):
         """
         ocr
@@ -237,6 +274,13 @@ class PaddlePytorchOCR(TextSystem):
             # dt_boxes, rec_res, _ = self.__call__(img, cls)
             dt_boxes, rec_res = self.__call__(img)
             return [[box.tolist(), res] for box, res in zip(dt_boxes, rec_res)]
+        
+        elif det and cls and not rec:
+            dt_boxes, img_crop_list, angle_list = self.detect_and_classify_text_regions(img)
+            return [
+                [box.tolist(), img_crop, angle] for box, img_crop, angle in zip(dt_boxes, img_crop_list, angle_list)
+            ]
+        
         elif det and not rec:
             dt_boxes, elapse = self.text_detector(img)
             if dt_boxes is None:
