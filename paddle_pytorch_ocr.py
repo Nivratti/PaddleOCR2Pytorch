@@ -91,7 +91,7 @@ def get_default_args():
         'limited_min_width': 16,
         'vis_font_path': './doc/fonts/simfang.ttf',
         'rec_char_dict_path': os.path.join(__dir__, "pytorchocr/utils/en_dict.txt"),
-        'use_angle_cls': False,
+        'use_angle_cls': True,
         'cls_model_path': os.path.join(MODEL_DIR, "cls_ft_4.0.1.pth"),
         'cls_image_shape': '3, 48, 192',
         'label_list': ['0', '180'],
